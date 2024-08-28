@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Step 1: Setting Up a Next.js Project
 
-## Getting Started
+1. Create a New Next.js App:
 
-First, run the development server:
+Use create-next-app to set up a new Next.js project.
 
-```bash
+npx create-next-app@latest 
+*What is your project named? » my-app*
+*Would you like to use TypeScript? » Yes*
+*Would you like to use ESLint? ... Yes*
+*Would you like to use Tailwind CSS? ... Yes*
+*Would you like to use `src/` directory? ... Yes*
+*Would you like to use App Router? (recommended) ... Yes*
+*Would you like to customize the default import alias (@/*)? ... Yes*
+*What import alias would you like configured? » @/*/*
+
+cd my-app
+
+2. Setting Up the @ Alias
+Configure jsconfig.json or tsconfig.json:
+Add the following configuration to your jsconfig.json (or tsconfig.json for TypeScript):
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}
+
+Update Next.js Configuration:
+In your next.config.js, you can ensure that the alias works with Next.js by adding:
+
+/** @type {import('next').NextConfig} */
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const nextConfig = {
+    webpack: (config) => {
+    config.resolve.alias['@'] = path.resolve(__dirname, 'src');
+    return config;
+  },
+  output: "export",
+  distDir: 'out',
+  images: {
+    unoptimized: true, // For static export
+  },
+};
+
+export default nextConfig;
+## Step 2: Set Up Capacitor
+
+npm install @capacitor/core @capacitor/cli
+npx cap init
+*Name ... App*
+*Package ID ... com.example.app*
+
+npm install @capacitor/ios @capacitor/android
+
+### Ensure index.html Exists
+Check the public Directory:
+
+Make sure that your Next.js project has an index.html file in the public directory. However, Next.js doesn’t use index.html directly; it uses the pages directory.
+
+Create an index.html File:
+
+You need to create an index.html file manually if it doesn’t exist. Place it in the public directory. For Next.js, this file can be minimal since the main content is served by Next.js pages.
+
+Create a folder in the root directory named "out"
+Create a file named index.html in the out directory with basic HTML content:
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>My Next.js App</title>
+  </head>
+  <body>
+    <div id="__next"></div>
+  </body>
+</html>
+
+Edit capacitor.config.ts or capacitor.config.json:
+Make sure the webDir property points to the directory where your static files are located:
+{
+  "appId": "com.example.app",
+  "appName": "App",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https"
+  }
+}
+
+npx cap add android
+npx cap add ios
+npx cap copy
+
+3. Run the Development Server:
+
+Start the development server to see your app in action.
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Your app will be available at http://localhost:3000.
